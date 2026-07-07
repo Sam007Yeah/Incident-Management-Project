@@ -23,8 +23,13 @@ Simple rendition of a ServiceNow type application. Three types of Roles:
 
 ## DataBase
 
-- Incidents(id, title, description, Conversation, team, employee_assigned_id, status, attachments, severity, end_date, start_date)
-- Users(Id, role, manager, team, password)
+- Incidents(id, title, description, Conversation, team, employee_assigned_id, status, attachments, severity, end_date, start_date, created_by)
+- Comments(id, incident_id, made_by, message)
+- Teams(id, manager_id)
+- Users(Id, name, role, manager_id, team, password_hash, email)
+- Roles(id, role)
+- Attachments(id, filename, path, type, incident_id, comment_id?)
+- Audit Logs?
 
 ## Backend
 

@@ -43,10 +43,12 @@ export async function initDB(additionalQueries?: string[]) {
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 status VARCHAR(50) NOT NULL,
+                priority VARCHAR(50) NOT NULL,
                 assigned_to VARCHAR,
                 assigned_team VARCHAR,
                 start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_by_id VARCHAR NOT NULL,
                 FOREIGN KEY (assigned_to) REFERENCES employees(id),
                 FOREIGN KEY (assigned_team) REFERENCES teams(id)
             );

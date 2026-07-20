@@ -5,4 +5,6 @@ export const employeeErrorConstants = {
     EMPLOYEE_GENERIC_LOGIN_FAILED: "Failed to login employee",
     EMPLOYEE_UPDATE_FAILED: "Failed to update employee",
     EMPLOYEE_ASSIGN_ROLE_FAILED: "Failed to assign role to employee",
+    EMPLOYEE_AUTHENTICATION_FAILED: "Failed to authenticate employee",
+    EMPLOYEE_ACCESS_OUT_OF_SCOPE: "Permission denied, you do not have access to this resource",
 }

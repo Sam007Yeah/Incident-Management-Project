@@ -60,7 +60,8 @@ export function employeeService() {
             const payload = {
                 id: employee.id,
                 email: employee.email,
-                roles: roles
+                roles: roles,
+                team: employee.team_id
             }
             const token = jwt.createToken(payload);
             return token;

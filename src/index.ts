@@ -3,11 +3,13 @@ import type { Request, Response } from 'express';
 import { initDB } from './DB/init.js';
 import employeeController from './controller/EmployeeController.js';
 import incidentController from './controller/incidentController.js';
+import openController from './controller/OpenController.js';
 import { globalErrorHandler } from './errorHandler/globalErrorHandler.js';
 
 const app = express();
 app.use(express.json());
 
+app.use("/api/v1", openController);
 app.use("/api/v1/employee", employeeController);
 app.use("/api/v1/incident", incidentController);
 

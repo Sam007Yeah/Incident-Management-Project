@@ -15,8 +15,7 @@ export function jwtService() {
                 return decoded;
             }
             catch (err) {
-                console.error("Error verifying token:", err);
-                return null;
+                throw new Error("Invalid token");
             }
         }
     }

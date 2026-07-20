@@ -2,80 +2,35 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import { employeeService } from '../service/employeeService.js';
 import type { Employee } from '../types/employeeType.js';
-import { EmployeeSchema } from '../types/employeeType.js';
-import { LoginRequestSchema } from '../types/RequestType.js';
-import type { LoginRequest } from '../types/RequestType.js';
 import { employeeErrorConstants } from '../errorHandler/employeeErrorConstants.js';
 import { AssignRoleRequestSchema } from '../types/RequestType.js';
+import { JwtAuthService } from '../service/authService/jwtAuthService.js';
 
 const employeeController = express.Router();
 const empService = employeeService();
+const jwtAuthService = new JwtAuthService();
 employeeController.use(express.json());
 
 employeeController.use((req: Request, res: Response, next) => {
     //Middleware to authenticate
-    console.log("Employee Controller Middleware: " + req.method + " " + req.url);
-    next();
-});
-
-//User Services for registering, login, logout, etc
-
-employeeController.post("/register", async (req: Request, res: Response, next: any) => {
-    // Logic to register a new employee in the database
-    const employee: Object = req.body;
-    const parseResult = EmployeeSchema.safeParse(employee);
-    if (parseResult.success) {
-        try {
-            await empService.registerEmpoyee(parseResult.data as Employee)
-                .then(() => {
-                    res.status(201).send({ "message": "Employee registered successfully" });
-                })
-                .catch((err) => {
-                    // console.error("Error registering employee:", err);
-                    // res.status(500).send({ "error": "Failed to register employee" });
-                    err.statusCode = 500;
-                    err.message = employeeErrorConstants.EMPLOYEE_REGISTRATION_FAILED;
-                    next(err);
-                });
-        } catch (err) {
-            // console.error("Error registering employee:", err);
-            // res.status(500).send({ "error": "Failed to register employee" });
-            (err as any).statusCode = 500;
-            (err as any).message = employeeErrorConstants.EMPLOYEE_REGISTRATION_FAILED;
-            next(err);
+    // console.log("Employee Controller Middleware: " + req.method + " " + req.url);
+    const token = req.headers.authorization?.split(' ')[1];
+    const user = jwtAuthService.authenticate({ token }).then((user) => {
+        console.log("Authentication successful");
+        if (user?.role.includes("admin") || user?.role.includes("manager")) {
+            next();
         }
-    }
-    else {
-        // res.status(400).send({ "error": "Invalid employee data", "details": parseResult.error.issues });
-        const error = new Error(employeeErrorConstants.EMPLOYEE_REGISTRATION_INVALID_DATA);
-        (error as any).statusCode = 400;
-        (error as any).detail = parseResult.error.issues;
-        next(error);
-    }
-});
-
-employeeController.post("/login", async (req: Request, res: Response, next: any) => {
-    const loginRequest: Object = req.body;
-    const parseResult = LoginRequestSchema.safeParse(loginRequest);
-    if (parseResult.success) {
-        await empService.loginEmployee(parseResult.data as LoginRequest)
-            .then((token) => {
-                res.status(200).send({ "message": "Login successful", "token": token });
-            })
-            .catch((err) => {
-                // console.error("Error logging in employee:", err);
-                // res.status(500).send({ "error": "Failed to login employee" });
-                err.statusCode = 500;
-                next(err);
-            });
-    }
-    else {
-        // res.status(400).send({ "error": "Invalid login data", "details": parseResult.error.issues });
-        const error = new Error(employeeErrorConstants.EMPLOYEE_LOGIN_INPUT_INVALID);
-        (error as any).statusCode = 400;
-        (error as any).detail = parseResult.error.issues;
-        next(error);
-    }
+        else {
+            const error = new Error(employeeErrorConstants.EMPLOYEE_ACCESS_OUT_OF_SCOPE);
+            (error as any).statusCode = 403;
+            next(error);
+        }
+    }).catch((err) => {
+        // console.error("Authentication failed:", err.message);
+        err.statusCode = 401;
+        err.message = employeeErrorConstants.EMPLOYEE_AUTHENTICATION_FAILED;
+        next(err);
+    });
 });
 
 employeeController.get("/health_check", (req: Request, res: Response) => {

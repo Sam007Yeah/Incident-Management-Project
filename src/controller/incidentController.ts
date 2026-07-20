@@ -5,16 +5,35 @@ import { IncidentSchema } from '../types/incidentType.js';
 import { IncidentUpdateSchema } from '../types/incidentType.js';
 import type { Incident } from '../types/incidentType.js';
 import { incidentErrorConstants } from '../errorHandler/incidentErrorConstants.js';
+import { JwtAuthService } from '../service/authService/jwtAuthService.js';
 
 const incidentController = express.Router();
 const incidentServiceInstance = incidentService();
+const jwtAuthService = new JwtAuthService();
 
 incidentController.use(express.json());
 
 incidentController.use((req: Request, res: Response, next) => {
     //Middleware to authenticate
-    console.log("Incident Controller Middleware: " + req.method + " " + req.url);
-    next();
+    // console.log("Incident Controller Middleware: " + req.method + " " + req.url);
+    // next();
+    const token = req.headers.authorization?.split(' ')[1];
+    jwtAuthService.authenticate({ token }).then((user) => {
+        console.log("Authentication successful");
+        if (user?.role.includes("admin") || user?.role.includes("manager") || user?.role.includes("employee_basic")) {
+            next();
+        }
+        else {
+            const error = new Error(incidentErrorConstants.INCIDENT_ACCESS_OUT_OF_SCOPE);
+            (error as any).statusCode = 403;
+            next(error);
+        }
+    }).catch((err) => {
+        // console.error("Authentication failed:", err.message);
+        err.statusCode = 401;
+        err.message = incidentErrorConstants.INCIDENT_AUTHENTICATION_FAILED;
+        next(err);
+    });
 });
 
 incidentController.get("/getAllIncidents", async (req: Request, res: Response, next: any) => {

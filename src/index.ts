@@ -1,10 +1,13 @@
 import express from 'express';
+import { configDotenv } from 'dotenv';
 import type { Request, Response } from 'express';
 import { initDB } from './DB/init.js';
 import employeeController from './controller/EmployeeController.js';
 import incidentController from './controller/incidentController.js';
 import openController from './controller/OpenController.js';
 import { globalErrorHandler } from './errorHandler/globalErrorHandler.js';
+
+configDotenv();
 
 const app = express();
 app.use(express.json());

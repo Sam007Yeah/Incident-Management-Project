@@ -8,6 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test": "tsx --test test/**/*.test.ts",
+    "test:coverage": "node --import tsx --test --experimental-test-coverage test/**/*.test.ts ",
     "test:watch": "tsx --test --watch test/**/*.test.ts"
   },
   "repository": {
@@ -42,6 +43,7 @@
     "jest": "^30.4.2",
     "tsx": "^4.23.0",
     "typescript": "^7.0.2",
+    "vitest": "^4.1.10",
     "zod": "^4.4.3"
   }
 }

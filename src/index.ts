@@ -1,5 +1,4 @@
 import express from 'express';
-import { configDotenv } from 'dotenv';
 import type { Request, Response } from 'express';
 import { initDB } from './DB/init.js';
 import employeeController from './controller/EmployeeController.js';
@@ -7,7 +6,6 @@ import incidentController from './controller/incidentController.js';
 import openController from './controller/OpenController.js';
 import { globalErrorHandler } from './errorHandler/globalErrorHandler.js';
 
-configDotenv();
 
 const app = express();
 app.use(express.json());
@@ -22,10 +20,23 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use(globalErrorHandler);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-    await initDB();
-    console.log("App Listening on port: " + PORT);
-});
+const PORT = Number(process.env.PORT ?? 3000);
+
+async function startServer() {
+    try {
+        await initDB();
+
+        app.listen(PORT, () => {
+            console.log(`App listening on port: ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Application startup failed:', error);
+        process.exitCode = 1;
+    }
+}
+
+void startServer();
+
+
 
 export default app;

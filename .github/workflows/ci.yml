@@ -3,6 +3,8 @@ name: Continuous Integration
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
     test:
         runs-on: ubuntu-latest
@@ -18,9 +20,9 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                node-version: '20'
+                node-version: '22'
             - name: Install dependencies
-              run: npm install
+              run: npm ci
             - name: Create env file
               run: |
                 echo "DB_USER=$DB_USER" > .env
@@ -29,8 +31,6 @@ jobs:
                 echo "DB_PORT=$DB_PORT" >> .env
                 echo "DB_NAME=$DB_NAME" >> .env
                 echo "NODE_ENV=$NODE_ENV" >> .env
-            - name: Run tests
-              run: npm test
             - name: Coverage Report
               run: npm run test:coverage
     build:
@@ -52,6 +52,6 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Build Docker image
-              run: docker build -t my-devops-app:${{ github.sha }} .
+              run: docker build -t incident-management-api:${{ github.sha }} .
                 
     

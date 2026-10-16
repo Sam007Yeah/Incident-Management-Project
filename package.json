@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "tsx --env-file=.env --test test/**/*.test.ts",
-    "test:coverage": "node --import tsx --test --experimental-test-coverage test/**/*.test.ts",
+    "test:coverage": "node --import tsx --env-file=.env --test --experimental-test-coverage test/**/*.test.ts",
     "test:watch": "tsx --test --watch test/**/*.test.ts"
   },
   "repository": {

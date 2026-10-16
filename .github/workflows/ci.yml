@@ -6,6 +6,13 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
+        env:
+            NODE_ENV: test
+            DB_USER: testuser
+            DB_PASSWORD: testpassword
+            DB_HOST: localhost
+            DB_PORT: 5432
+            DB_NAME: testdb
         steps:
             - uses: actions/checkout@v4
             - name: Set up Node.js
@@ -14,6 +21,14 @@ jobs:
                 node-version: '20'
             - name: Install dependencies
               run: npm install
+            - name: Create env file
+              run: |
+                echo "DB_USER=$DB_USER" > .env
+                echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+                echo "DB_HOST=$DB_HOST" >> .env
+                echo "DB_PORT=$DB_PORT" >> .env
+                echo "DB_NAME=$DB_NAME" >> .env
+                echo "NODE_ENV=$NODE_ENV" >> .env
             - name: Run tests
               run: npm test
             - name: Coverage Report

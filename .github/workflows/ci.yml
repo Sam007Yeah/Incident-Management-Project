@@ -1,0 +1,45 @@
+# CI Pipeline for running Tests and Building the project
+name: Continuous Integration
+on:
+  push:
+    branches: [ main ]
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '20'
+            - name: Install dependencies
+              run: npm install
+            - name: Run tests
+              run: npm test
+            - name: Coverage Report
+              run: npm run test:coverage
+            - if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+              name: Upload coverage report
+              uses: actions/upload-artifact@v3
+              with:
+                name: coverage-report
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '20'
+            - name: Install dependencies
+              run: npm install
+            - name: Build project
+              run: npm run build
+    build-image:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Build Docker image
+              run: docker build -t my-devops-app:${{ github.sha }} .
+                
+    
